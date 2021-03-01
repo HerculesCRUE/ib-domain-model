@@ -58,4 +58,4 @@ jobs:
         env:
           GITHUB_USER: ${{ secrets.PERSONAL_GITHUB_USER }}
           GITHUB_USER_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-        run: mvn -s ./.ci/settings.xml -B clean deploy javadoc:jar source:jar -DaltDeploymentRepository='github::default::https://maven.pkg.github.com/rgavilan/ib-domain-model'
+        run: mvn -s ./.ci/settings.xml -B clean deploy javadoc:jar source:jar -DaltDeploymentRepository='github::default::https://maven.pkg.github.com/HerculesCRUE/ib-domain-model'
