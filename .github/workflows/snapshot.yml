@@ -59,3 +59,11 @@ jobs:
           GITHUB_USER: ${{ secrets.PERSONAL_GITHUB_USER }}
           GITHUB_USER_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
         run: mvn -s ./.ci/settings.xml -B clean deploy javadoc:jar source:jar -DaltDeploymentRepository='github::default::https://maven.pkg.github.com/HerculesCRUE/ib-domain-model'
+      - name: Microsoft Teams Notification
+        uses: skitionek/notify-microsoft-teams@master
+        if: failure()
+        with:
+          webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
+          needs: ${{ toJson(needs) }}
+          job: ${{ toJson(job) }}
+          steps: ${{ toJson(steps) }}
