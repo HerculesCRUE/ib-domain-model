@@ -3,7 +3,7 @@ name: Autodeploy SNAPSHOTS
 on: 
   push:
     # Execute on all branches except master
-    branches-ignore:
+    branches:
       - master
 
 jobs:
@@ -14,7 +14,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: nelonoel/branch-name@v1.0.1
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
@@ -26,34 +25,6 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Set SNAPSHOT version
-        run: |
-          MAVEN_VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
-          snapshotSuffix='-SNAPSHOT'
-          branchSeparator='/'
-          newVersion=${MAVEN_VERSION}
-          branch=${BRANCH_NAME}
-
-          if [[ $MAVEN_VERSION == *$snapshotSuffix ]]; then
-            newVersion=${MAVEN_VERSION%$snapshotSuffix}
-          fi
-
-          if [[ ${BRANCH_NAME} == 'develop' ]]; then
-            branch=''
-            newVersion=${newVersion}${snapshotSuffix}
-          elif [[ ${BRANCH_NAME} == *$branchSeparator* ]]; then
-            branch=$(cut -d $branchSeparator -f2 <<< ${BRANCH_NAME})
-
-            if [[ ${newVersion} != *${branch}* ]]; then
-              newVersion=$newVersion-${branch}${snapshotSuffix}
-            else
-              newVersion=${newVersion}${snapshotSuffix}
-            fi
-          else
-            newVersion=${newVersion}-${branch}${snapshotSuffix}
-          fi
-
-          mvn -B versions:set -DnewVersion=${newVersion} -DgenerateBackupPoms=false
       - name: Build with Maven
         env:
           GITHUB_USER: ${{ secrets.PERSONAL_GITHUB_USER }}
@@ -64,7 +35,7 @@ jobs:
         if: failure()
         with:
           webhook_url: ${{ secrets.MSTEAMS_WEBHOOK }}
-          overwrite: "{title: `domain-model (SNAPSHOT)`}"
+          overwrite: "{title: `domain-model (Release)`}"
           needs: ${{ toJson(needs) }}
           job: ${{ toJson(job) }}
           steps: ${{ toJson(steps) }}
