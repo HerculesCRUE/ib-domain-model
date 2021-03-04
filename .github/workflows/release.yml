@@ -1,4 +1,4 @@
-name: Autodeploy SNAPSHOTS
+name: Release Maven
 
 on: 
   push:
